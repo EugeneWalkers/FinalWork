@@ -1,0 +1,32 @@
+<resources>
+    <string name="app_name">FinalWork</string>
+    <string name="title_activity_test_view">TestViewActivity</string>
+    <string name="game_dialog_title">Loading</string>
+    <string name="login_input_text">Email</string>
+    <string name="password_input_text">Password</string>
+    <string name="sign_in">Sign in</string>
+    <string name="name">Name</string>
+    <string name="type">Type</string>
+    <string name="register_button">Register</string>
+    <string name="register">Register</string>
+    <string name="profile">Profile</string>
+    <string name="tests">Tests</string>
+    <string name="prev">Prev</string>
+    <string name="next">Next</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="finish">Finish</string>
+    <string name="congratulations">Congratulations!\nYou have finished the test and your result is:</string>
+    <string name="logout">Logout</string>
+    <string name="admin_panel">Admin panel</string>
+    <string name="add_test">Add test</string>
+    <string name="add_question">Add question</string>
+    <string name="questionTextHint">Enter question text here</string>
+    <string name="answer_1">Answer 1</string>
+    <string name="answer_2">Answer 2</string>
+    <string name="answer_3">Answer 3</string>
+    <string name="answer_4">Answer 4</string>
+    <string name="write_question">Write question</string>
+    <string name="right">Right:</string>
+    <string name="write">Write question</string>
+</resources>
