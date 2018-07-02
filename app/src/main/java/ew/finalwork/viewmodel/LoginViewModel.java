@@ -1,9 +1,11 @@
 package ew.finalwork.viewmodel;
 
+import android.app.Activity;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.ViewModel;
 import android.support.annotation.NonNull;
+import android.util.Log;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -16,35 +18,36 @@ import java.util.HashMap;
 import java.util.Map;
 
 import ew.finalwork.model.User;
+import ew.finalwork.utilities.DataUtility;
 
 public class LoginViewModel extends ViewModel {
 
     FirebaseFirestore db;
     FirebaseAuth mAuth;
-    private MutableLiveData<User> user = new MutableLiveData<>();
+    private MutableLiveData<String> userState = new MutableLiveData<>();
+    private User user;
+    public static final String LOGIN_VIEW_MODEL_TAG = "login_view_model_tag";
+    public static final String NOT_SIGNED = "not signed";
+    public static final String SIGNING = "signing";
+    public static final String ERROR_SIGNIN = "error";
+    public static final String SUCCESS_SIGNIN = "success";
 
-    public LiveData<Boolean> getIsDialogShow() {
-        return isDialogShow;
-    }
-
-    public void setIsDialogShow(MutableLiveData<Boolean> isDialogShow) {
-        this.isDialogShow = isDialogShow;
-    }
-
-    private MutableLiveData<Boolean> isDialogShow = new MutableLiveData<>();
     String login, password;
 
     public LoginViewModel() {
         super();
-        user.postValue(null);
-        isDialogShow.postValue(false);
-
+        mAuth = FirebaseAuth.getInstance();
+        user = null;
+        userState.postValue(NOT_SIGNED);
     }
 
-    public void readUserFromBase(@NonNull FirebaseUser firebaseUser){
+    public void readUserFromBase(@NonNull FirebaseUser firebaseUser) {
         db = FirebaseFirestore.getInstance();
         String email = firebaseUser.getEmail();
-        DocumentReference dataReader = db.collection("users").document(email);
+        if (!SIGNING.equals(userState.getValue())) {
+            userState.postValue(SIGNING);
+        }
+        DocumentReference dataReader = db.collection(DataUtility.USERS).document(email);
         dataReader.get().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 DocumentSnapshot document = task.getResult();
@@ -52,45 +55,59 @@ public class LoginViewModel extends ViewModel {
                     Map<String, Object> data = document.getData();
                     String type = data.get("type").toString();
                     Map<String, String> results = new HashMap<>();
-                    if (data.containsKey("results")){
-                        ArrayList<String> notParcedResults = (ArrayList)data.get("results");
-                        for (int i=0; i<notParcedResults.size(); i++){
+                    if (data.containsKey("results")) {
+                        ArrayList<String> notParcedResults = (ArrayList) data.get("results");
+                        for (int i = 0; i < notParcedResults.size(); i++) {
                             String[] result = notParcedResults.get(i).split(":");
                             results.put(result[0], result[1]);
                         }
                     }
-                    user.postValue(new User(firebaseUser, type, results));
+                    user = new User(firebaseUser, type, results);
+                    userState.postValue(SUCCESS_SIGNIN);
+                } else {
+                    userState.postValue(ERROR_SIGNIN);
+                    //userState.postValue(NOT_SIGNED);
                 }
+            } else {
+                userState.postValue(ERROR_SIGNIN);
+                //userState.postValue(NOT_SIGNED);
             }
-            isDialogShow.postValue(false);
-        }).addOnFailureListener(task->{
-            isDialogShow.postValue(false);
+        }).addOnFailureListener(task -> {
+            userState.postValue(ERROR_SIGNIN);
+            //userState.postValue(NOT_SIGNED);
         });
     }
 
-    public void onLoginClicked(String login, String password) {
-        isDialogShow.postValue(true);
+    public void onLoginClicked(String login, String password, Activity activity) {
         this.login = login;
         this.password = password;
-        mAuth.signInWithEmailAndPassword(login, password).addOnCompleteListener(task -> {
-            if (task.isSuccessful()){
+        userState.postValue(SIGNING);
+        mAuth.signInWithEmailAndPassword(login, password).addOnCompleteListener(activity, task -> {
+            Log.i(LOGIN_VIEW_MODEL_TAG, "entering...");
+            if (task.isSuccessful()) {
                 FirebaseUser fireuser = mAuth.getCurrentUser();
-                if (fireuser != null){
-                    readUserFromBase(fireuser);
-                }
-                else{
-                    isDialogShow.postValue(false);
-                    user.postValue(null);
-                }
+                readUserFromBase(fireuser);
+
+            } else {
+                userState.postValue(ERROR_SIGNIN);
+                //userState.postValue(NOT_SIGNED);
             }
-            isDialogShow.postValue(false);
-        }).addOnFailureListener(task->{
-            isDialogShow.postValue(false);
+        }).addOnFailureListener(activity, task -> {
+            userState.postValue(ERROR_SIGNIN);
+            //userState.postValue(NOT_SIGNED);
         });
     }
 
 
-    public LiveData<User> getUser() {
+    public LiveData<String> getUserState() {
+        return userState;
+    }
+
+    public FirebaseUser getFireUser() {
+        return mAuth.getCurrentUser();
+    }
+
+    public User getUser() {
         return user;
     }
 

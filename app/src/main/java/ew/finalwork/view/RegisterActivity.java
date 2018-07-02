@@ -22,7 +22,7 @@ public class RegisterActivity extends AppCompatActivity {
             String name = ((TextView)findViewById(R.id.name_input_register)).getText().toString();
             String login = ((TextView)findViewById(R.id.login_input_register)).getText().toString();
             String password = ((TextView)findViewById(R.id.password_input_register)).getText().toString();
-            if (LoginUtility.isValid(login)){
+            if (LoginUtility.isLoginValid(login)){
                 createNewUser(name, login, password);
             }
 

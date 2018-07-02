@@ -6,7 +6,6 @@ import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
-import android.widget.Toast;
 
 public class LoadingDialog extends DialogFragment {
 
@@ -30,8 +29,5 @@ public class LoadingDialog extends DialogFragment {
         return progressDialog;
     }
 
-    public void showNotFound(){
-        Toast.makeText(activity, "Wrong login or password!", Toast.LENGTH_SHORT).show();
-    }
 
 }

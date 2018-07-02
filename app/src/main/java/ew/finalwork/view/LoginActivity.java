@@ -12,59 +12,58 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-
 import ew.finalwork.R;
-import ew.finalwork.model.User;
+import ew.finalwork.utilities.DataUtility;
 import ew.finalwork.utilities.LoginUtility;
 import ew.finalwork.viewmodel.LoginViewModel;
 
 public class LoginActivity extends AppCompatActivity {
 
     LoginViewModel viewModel;
-    private FirebaseAuth mAuth;
     LoadingDialog dialog;
+    public static final String LOGIN_ACTIVITY_TAG = "login_activity";
     public static final String LOADING_DIALOG_TAG = "loading_dialog_tag";
-    private static final String LOGIN_TAG = "loading_dialog_tag";
-    private static final String PASSWORD_TAG = "loading_dialog_tag";
+    public static final String LOGIN_TAG = "loading_dialog_tag";
+    public static final String PASSWORD_TAG = "loading_dialog_tag";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mAuth = FirebaseAuth.getInstance();
-        viewModel = ViewModelProviders.of(this).get(LoginViewModel.class);
-        dialog = LoadingDialog.newInstance(this);
-        FirebaseUser currentUser = mAuth.getCurrentUser();
-        if (currentUser != null){
-            viewModel.readUserFromBase(currentUser);
-        }
         setContentView(R.layout.activity_login);
+        viewModel = ViewModelProviders.of(this).get(LoginViewModel.class);
         setButtonLogin();
-        Observer<User> observerUser = user -> {
-            if (user != null) {
-                Intent goToMain = new Intent(LoginActivity.this, MainActivity.class);
-                goToMain.putExtra("user", user);
-                startActivity(goToMain);
+        dialog = LoadingDialog.newInstance(this);
+        Observer<String> observerUserState = userState -> {
+            if (userState != null) {
+                Log.i(LOGIN_ACTIVITY_TAG, userState);
+                switch (userState){
+                    case LoginViewModel.NOT_SIGNED:
+                        break;
+                    case LoginViewModel.SIGNING:
+                        dialog.show(getSupportFragmentManager(), LOADING_DIALOG_TAG);
+                        break;
+                    case LoginViewModel.ERROR_SIGNIN:
+                        dialog.dismiss();
+                        //((MutableLiveData<String>)(viewModel.getUserState())).postValue(LoginViewModel.NOT_SIGNED);
+                        Toast.makeText(this, "Error sign in!", Toast.LENGTH_SHORT).show();
+                        break;
+                    case LoginViewModel.SUCCESS_SIGNIN:
+
+                        dialog.dismiss();
+                        Intent goToMain = new Intent(LoginActivity.this, MainActivity.class);
+                        goToMain.putExtra(DataUtility.USER_INFO, viewModel.getUser());
+                        startActivity(goToMain);
+                        finish();
+                        break;
+                }
             }
-            else{
-                Toast.makeText(this, "Error sign in!", Toast.LENGTH_SHORT).show();
-            }
-            Log.i("lololo", "smth changed");
         };
-        Observer<Boolean> isDialogShowObserver = aBoolean -> {
-            if (aBoolean){
-                dialog.show(getSupportFragmentManager(), LOADING_DIALOG_TAG);
-            }
-            else{
-                dialog.dismiss();
-            }
-        };
-        LiveData<User> user = viewModel.getUser();
-        user.observe(this, observerUser);
-        LiveData<Boolean> dialogLiveData = viewModel.getIsDialogShow();
-        dialogLiveData.observe(this, isDialogShowObserver);
-        Log.i("End", "End");
+        LiveData<String> user = viewModel.getUserState();
+        user.observe(this, observerUserState);
+        if (viewModel.getFireUser() != null){
+            viewModel.readUserFromBase(viewModel.getFireUser());
+            //FirebaseAuth.getInstance().signOut();
+        }
     }
 
     private void setButtonLogin() {
@@ -72,9 +71,8 @@ public class LoginActivity extends AppCompatActivity {
         loginButton.setOnClickListener(view -> {
             String login = ((EditText) findViewById(R.id.login_input)).getText().toString();
             String password = ((EditText) findViewById(R.id.password_input)).getText().toString();
-            if (LoginUtility.isValid(login)) {
-                dialog.show(getSupportFragmentManager(), LOADING_DIALOG_TAG);
-                viewModel.onLoginClicked(login, password);
+            if (LoginUtility.isLoginValid(login) && LoginUtility.isPasswordValid(password)) {
+                viewModel.onLoginClicked(login, password, this);
             } else {
                 Toast.makeText(LoginActivity.this, "Invalid login!", Toast.LENGTH_SHORT).show();
             }
@@ -91,5 +89,4 @@ public class LoginActivity extends AppCompatActivity {
         });
 
     }
-
 }

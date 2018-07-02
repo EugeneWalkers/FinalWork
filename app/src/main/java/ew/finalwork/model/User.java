@@ -9,10 +9,6 @@ import java.util.Map;
 
 public class User implements Parcelable{
 
-    public static final String LOGIN = "login";
-    public static final String TYPE = "type";
-    public static final String RESULTS = "results";
-
     private FirebaseUser user;
     private String type;
     private Map<String, String> results;
@@ -55,7 +51,7 @@ public class User implements Parcelable{
 
     @Override
     public void writeToParcel(Parcel parcel, int i) {
-        parcel.writeValue(user);
+        parcel.writeParcelable(user, i);
         parcel.writeString(type);
         parcel.writeMap(results);
     }
@@ -70,10 +66,10 @@ public class User implements Parcelable{
         }
     };
 
-    // example constructor that takes a Parcel and gives you an object populated with it's values
     private User(Parcel in) {
-        user = (FirebaseUser)in.readValue(FirebaseUser.class.getClassLoader());
+        user = in.readParcelable(FirebaseUser.class.getClassLoader());
         type = in.readString();
-        in.readMap(getResults(), Map.class.getClassLoader());
+        in.readMap(results, Map.class.getClassLoader());
+
     }
 }
