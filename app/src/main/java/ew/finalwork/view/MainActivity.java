@@ -120,7 +120,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void setToolbar(){
         toolbar = findViewById(R.id.toolbar);
-//        toolbar.inflateMenu(R.menu.toolbar_menu);
+        toolbar.inflateMenu(R.menu.toolbar_menu);
 //        MenuItem refresh = toolbar.findViewById(R.id.action_refresh);
 //        refresh.setOnMenuItemClickListener(menuItem -> {
 //            switch (selectedItem){

@@ -29,4 +29,5 @@
     <string name="write_question">Write question</string>
     <string name="right">Right:</string>
     <string name="write">Write question</string>
+    <string name="refresh">Refresh</string>
 </resources>
