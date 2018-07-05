@@ -49,10 +49,10 @@ public class LoginActivity extends AppCompatActivity {
                         break;
                     case LoginViewModel.SUCCESS_SIGNIN:
 
-                        dialog.dismiss();
                         Intent goToMain = new Intent(LoginActivity.this, MainActivity.class);
                         goToMain.putExtra(DataUtility.USER_INFO, viewModel.getUser());
                         startActivity(goToMain);
+                        dialog.dismiss();
                         finish();
                         break;
                 }

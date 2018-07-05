@@ -162,4 +162,27 @@ public class MainViewModel extends ViewModel implements NavigationView.OnNavigat
         tests.getValue().add(test);
         tests.postValue(tests.getValue());
     }
+
+//    public void onAddClicked(String value){
+//        CollectionReference reference = dataBase.collection(DataUtility.TESTS);
+//        reference.document(DataUtility.METADATA).get().addOnCompleteListener(task -> {
+//            if (task.isSuccessful()) {
+//                DocumentSnapshot document = task.getResult();
+//                if (document.exists()) {
+//                    //ArrayList<String> tests = (ArrayList<String>) document.get("tests-array");
+//                    //tests.add(value);
+//                    tests.getValue().add(new Test(new ArrayList<>(), value));
+//                    reference.document(DataUtility.METADATA).update("tests-array", tests);
+//                    Map<String, Object> map = new HashMap<>();
+//                    map.put("name", value);
+//                    reference.document(value).set(map);
+//                    Intent intent = new Intent(getActivity(), AdminActivity.class);
+//                    intent.putExtra(MainActivity.TEST_NAME, value);
+//                    startActivity(intent);
+//                }
+//            }
+//
+//        });
+//    }
+
 }
