@@ -5,15 +5,15 @@ import android.os.Parcelable;
 
 import com.google.firebase.auth.FirebaseUser;
 
-import java.util.Map;
+import java.util.ArrayList;
 
 public class User implements Parcelable{
 
     private FirebaseUser user;
     private String type;
-    private Map<String, String> results;
+    private ArrayList<TestResult> results;
 
-    public User(FirebaseUser user, String type, Map<String, String> results) {
+    public User(FirebaseUser user, String type, ArrayList<TestResult> results) {
         this.user = user;
         this.type = type;
         this.results = results;
@@ -36,12 +36,25 @@ public class User implements Parcelable{
         this.type = type;
     }
 
-    public Map<String, String> getResults() {
+    public ArrayList<TestResult> getResults() {
         return results;
     }
 
-    public void setResults(Map<String, String> results) {
+    public void setResults(ArrayList<TestResult> results) {
         this.results = results;
+    }
+
+    public void addResult(TestResult result){
+        boolean isExist = false;
+        for (int i=0; i<results.size(); i++){
+            if (results.get(i).getTestName().equals(result.getTestName())){
+                isExist = true;
+                results.get(i).setTestResult(result.getTestResult());
+            }
+        }
+        if (!isExist){
+            this.results.add(result);
+        }
     }
 
     @Override
@@ -53,7 +66,7 @@ public class User implements Parcelable{
     public void writeToParcel(Parcel parcel, int i) {
         parcel.writeParcelable(user, i);
         parcel.writeString(type);
-        parcel.writeMap(results);
+        parcel.writeList(results);
     }
 
     public static final Parcelable.Creator<User> CREATOR = new Parcelable.Creator<User>() {
@@ -69,7 +82,15 @@ public class User implements Parcelable{
     private User(Parcel in) {
         user = in.readParcelable(FirebaseUser.class.getClassLoader());
         type = in.readString();
-        in.readMap(results, Map.class.getClassLoader());
+        results = in.readArrayList(TestResult.class.getClassLoader());
 
+    }
+
+    public ArrayList<String> getStringResults(){
+        ArrayList<String> results = new ArrayList<>();
+        for (int i=0; i<this.results.size(); i++){
+            results.add(this.results.get(i).toString());
+        }
+        return results;
     }
 }

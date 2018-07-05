@@ -62,7 +62,6 @@ public class LoginActivity extends AppCompatActivity {
         user.observe(this, observerUserState);
         if (viewModel.getFireUser() != null){
             viewModel.readUserFromBase(viewModel.getFireUser());
-            //FirebaseAuth.getInstance().signOut();
         }
     }
 

@@ -1,81 +1,49 @@
 package ew.finalwork.view;
 
+import android.arch.lifecycle.Observer;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.FirebaseFirestore;
-
 import ew.finalwork.R;
 import ew.finalwork.model.User;
-import ew.finalwork.utilities.DataUtility;
+import ew.finalwork.viewmodel.MainViewModel;
 
 public class ProfileFragment extends Fragment {
 
-    String name, type, id;
-    RecyclerView mRecyclerView;
-    FirebaseFirestore db;
-    DocumentReference ref1;
-    RecyclerView.Adapter mAdapter;
-    String[] tests, results;
-    CollectionReference referenceUsers;
+    private RecyclerView mRecyclerView;
+    private MainViewModel viewModel;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Bundle b = getArguments();
-        if (b != null) {
-            User user = b.getParcelable(DataUtility.USER_INFO);
-            name = user.getUser().getEmail();
-            type = user.getType();
-            id = user.getUser().getUid();
-        }
-        db = FirebaseFirestore.getInstance();
-        referenceUsers = db.collection(DataUtility.USERS);
+        viewModel = MainActivity.obtainViewModel(getActivity());
     }
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_profile, container, false);
-        ((TextView) v.findViewById(R.id.name)).setText(name);
-        ((TextView) v.findViewById(R.id.type)).setText(type);
-//        mRecyclerView = v.findViewById(R.id.userTests);
-//        mRecyclerView.setHasFixedSize(true);
-//        RecyclerView.LayoutManager mLayoutManager;
-//        mLayoutManager = new LinearLayoutManager(this.getActivity());
-//        mRecyclerView.setLayoutManager(mLayoutManager);
-//        //Получаем количество тестов
-//        ref1 = referenceUsers.document(id);
-//        ref1.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-//            @Override
-//            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-//                if (task.isSuccessful()) {
-//                    DocumentSnapshot document = task.getResult();
-//                    if (document.exists()) {
-//
-//                        Map<String, Object> notParsedTest = document.getData();
-//                        if (notParsedTest.containsKey("results")){
-//
-//                            String arrayOfTestsInUser = notParsedTest.get("results").toString();
-//                            results = arrayOfTestsInUser.substring(1, arrayOfTestsInUser.length()-1).split(", ");
-//                            mAdapter = new ResultsAdapter(results);
-//                            mRecyclerView.setAdapter(mAdapter);
-//                        }
-//                    }
-//                }
-//            }
-//        });
+        mRecyclerView = v.findViewById(R.id.userTests);
+        mRecyclerView.setHasFixedSize(true);
+        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(this.getActivity());
+        mRecyclerView.setLayoutManager(mLayoutManager);
+        Observer<User> userObserver = user -> {
+            ((TextView) v.findViewById(R.id.name)).setText(user.getUser().getEmail());
+            ((TextView) v.findViewById(R.id.type)).setText(user.getType());
+            mRecyclerView.setAdapter(viewModel.getResultsAdapterInstance());
+        };
+        viewModel.getUser().observe(this, userObserver);
         return v;
     }
+
 
 }
 // user: test1:0.5, test3:1

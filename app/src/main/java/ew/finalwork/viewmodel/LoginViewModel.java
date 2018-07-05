@@ -14,9 +14,9 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Map;
 
+import ew.finalwork.model.TestResult;
 import ew.finalwork.model.User;
 import ew.finalwork.utilities.DataUtility;
 
@@ -54,12 +54,12 @@ public class LoginViewModel extends ViewModel {
                 if (document.exists()) {
                     Map<String, Object> data = document.getData();
                     String type = data.get("type").toString();
-                    Map<String, String> results = new HashMap<>();
+                    ArrayList<TestResult> results = new ArrayList<>();
                     if (data.containsKey("results")) {
                         ArrayList<String> notParcedResults = (ArrayList) data.get("results");
                         for (int i = 0; i < notParcedResults.size(); i++) {
                             String[] result = notParcedResults.get(i).split(":");
-                            results.put(result[0], result[1]);
+                            results.add(new TestResult(result[0], result[1]));
                         }
                     }
                     user = new User(firebaseUser, type, results);
