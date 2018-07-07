@@ -21,10 +21,11 @@ public class LoginActivity extends AppCompatActivity {
 
     LoginViewModel viewModel;
     LoadingDialog dialog;
-    public static final String LOGIN_ACTIVITY_TAG = "login_activity";
+    public static final String TAG = "login_activity";
     public static final String LOADING_DIALOG_TAG = "loading_dialog_tag";
-    public static final String LOGIN_TAG = "loading_dialog_tag";
-    public static final String PASSWORD_TAG = "loading_dialog_tag";
+    public static final String LOGIN_TAG = "login_tag";
+    public static final String PASSWORD_TAG = "password_tag";
+    public static final int REQUEST_CODE = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,7 +36,7 @@ public class LoginActivity extends AppCompatActivity {
         dialog = LoadingDialog.newInstance(this);
         Observer<String> observerUserState = userState -> {
             if (userState != null) {
-                Log.i(LOGIN_ACTIVITY_TAG, userState);
+                Log.i(TAG, userState);
                 switch (userState){
                     case LoginViewModel.NOT_SIGNED:
                         break;
@@ -44,14 +45,13 @@ public class LoginActivity extends AppCompatActivity {
                         break;
                     case LoginViewModel.ERROR_SIGNIN:
                         dialog.dismiss();
-                        //((MutableLiveData<String>)(viewModel.getUserState())).postValue(LoginViewModel.NOT_SIGNED);
                         Toast.makeText(this, "Error sign in!", Toast.LENGTH_SHORT).show();
                         break;
                     case LoginViewModel.SUCCESS_SIGNIN:
 
                         Intent goToMain = new Intent(LoginActivity.this, MainActivity.class);
                         goToMain.putExtra(DataUtility.USER_INFO, viewModel.getUser());
-                        startActivity(goToMain);
+                        startActivityForResult(goToMain, REQUEST_CODE);
                         dialog.dismiss();
                         finish();
                         break;
@@ -84,8 +84,22 @@ public class LoginActivity extends AppCompatActivity {
             String password = ((EditText) findViewById(R.id.password_input)).getText().toString();
             goToRegister.putExtra(LOGIN_TAG, login);
             goToRegister.putExtra(PASSWORD_TAG, password);
-            startActivity(goToRegister);
+            startActivityForResult(goToRegister, REQUEST_CODE);
         });
+    }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode == RegisterActivity.RESULT_CODE){
+            switch (requestCode){
+                case REQUEST_CODE:
+                    data.setClass(LoginActivity.this, MainActivity.class);
+                    startActivity(data);
+                    break;
+                default:
+                    Log.i(TAG, "Error with starting activity after register");
+                    break;
+            }
+        }
     }
 }
