@@ -4,6 +4,7 @@ import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -13,6 +14,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import ew.finalwork.R;
+import ew.finalwork.receivers.NetworkChangeReceiver;
 import ew.finalwork.utilities.DataUtility;
 import ew.finalwork.utilities.LoginUtility;
 import ew.finalwork.viewmodel.LoginViewModel;
@@ -53,6 +55,7 @@ public class LoginActivity extends AppCompatActivity {
                         goToMain.putExtra(DataUtility.USER_INFO, viewModel.getUser());
                         startActivityForResult(goToMain, REQUEST_CODE);
                         dialog.dismiss();
+                        registerReceiver(new NetworkChangeReceiver(), new IntentFilter(NetworkChangeReceiver.SYNC_COMMAND));
                         finish();
                         break;
                 }
