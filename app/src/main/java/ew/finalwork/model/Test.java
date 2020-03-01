@@ -79,4 +79,14 @@ public class Test implements Parcelable {
         testName = in.readString();
         description = in.readString();
     }
+
+    @Override
+    public String toString(){
+        StringBuilder resultBuilder = new StringBuilder("");
+        resultBuilder.append(testName).append("\n").append(description);
+        for (int i=0; i<questions.size(); i++){
+            resultBuilder.append("\n").append(questions.get(i).toString());
+        }
+        return resultBuilder.toString();
+    }
 }

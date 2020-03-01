@@ -77,4 +77,15 @@ public class Question implements Parcelable{
         questionText = in.readString();
         rightQuestion = in.readInt();
     }
+
+    @Override
+    public String toString(){
+        StringBuilder resultBuilder = new StringBuilder("");
+        resultBuilder.append(questionText).append(":");
+        for (String answer:answers){
+            resultBuilder.append(answer).append(":");
+        }
+        resultBuilder.append(rightQuestion);
+        return resultBuilder.toString();
+    }
 }

@@ -43,6 +43,7 @@ public class LoginViewModel extends ViewModel {
 
     public void readUserFromBase(@NonNull FirebaseUser firebaseUser) {
         db = FirebaseFirestore.getInstance();
+        FirebaseFirestore.setLoggingEnabled(true);
         String email = firebaseUser.getEmail();
         if (!SIGNING.equals(userState.getValue())) {
             userState.postValue(SIGNING);

@@ -25,6 +25,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import ew.finalwork.R;
 import ew.finalwork.model.TestResult;
 import ew.finalwork.model.User;
+import ew.finalwork.receivers.NetworkChangeReceiver;
 import ew.finalwork.utilities.DataUtility;
 import ew.finalwork.viewmodel.MainViewModel;
 import ew.finalwork.viewmodel.ViewModelFactory;
@@ -87,6 +88,7 @@ public class MainActivity extends AppCompatActivity {
                     startActivity(intent);
                     finish();
                     FirebaseAuth.getInstance().signOut();
+                    unregisterReceiver(NetworkChangeReceiver.getInstance());
                     break;
             }
 

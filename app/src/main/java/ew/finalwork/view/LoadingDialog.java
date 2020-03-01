@@ -26,6 +26,7 @@ public class LoadingDialog extends DialogFragment {
         progressDialog.setOnDismissListener(dialogInterface -> {
 
         });
+        progressDialog.setCanceledOnTouchOutside(false);
         return progressDialog;
     }
 

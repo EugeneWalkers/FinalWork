@@ -55,7 +55,7 @@ public class LoginActivity extends AppCompatActivity {
                         goToMain.putExtra(DataUtility.USER_INFO, viewModel.getUser());
                         startActivityForResult(goToMain, REQUEST_CODE);
                         dialog.dismiss();
-                        registerReceiver(new NetworkChangeReceiver(), new IntentFilter(NetworkChangeReceiver.SYNC_COMMAND));
+                        registerReceiver(NetworkChangeReceiver.getInstance(), new IntentFilter(NetworkChangeReceiver.SYNC_COMMAND));
                         finish();
                         break;
                 }
